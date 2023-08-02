@@ -1,9 +1,11 @@
 import { useAutoScroll } from '@/hooks/common/useAutoScroll';
 import { useScrollFocus } from '@/hooks/common/useScrollFocus';
 import { focusedIdState } from '@/store/scrollFocus';
+import { PATH } from '@constants/path';
 import type { TripItemData } from '@type/tripItem';
 import { Button, Divider, Heading, Text, Toast, useOverlay } from 'hang-log-design-system';
 import { Fragment, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 
 import { useDayLogOrderMutation } from '@hooks/api/useDayLogOrderMutation';
@@ -20,9 +22,10 @@ interface TripItemListProps {
   tripId: number;
   dayLogId: number;
   tripItems: TripItemData[];
+  isEditable?: boolean;
 }
 
-const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
+const TripItemList = ({ tripId, dayLogId, tripItems, isEditable = true }: TripItemListProps) => {
   const dayLogOrderMutation = useDayLogOrderMutation();
   const { observer } = useScrollFocus();
   const listRef = useRef<HTMLOListElement>(null);
@@ -59,45 +62,62 @@ const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
   return (
     <>
       <ol css={containerStyling} ref={listRef}>
-        {items.map((item, index) => {
-          console.log('focusedId', focusedId, focusedId === item.id);
-          return (
-            <Fragment key={item.id}>
-              <TripItem
-                tripId={tripId}
-                dayLogId={dayLogId}
-                observer={observer}
-                onDragStart={handleDragStart(index)}
-                onDragEnter={handleDragEnter(index)}
-                onDragEnd={handleDragEnd}
-                {...item}
-                ref={focusedId === item.id ? itemRef : null}
-              />
-              <Divider />
-            </Fragment>
-          );
-        })}
+        {items.map((item, index) => (
+          <Fragment key={item.id}>
+            <TripItem
+              tripId={tripId}
+              dayLogId={dayLogId}
+              isEditable={isEditable}
+              observer={observer}
+              onDragStart={isEditable ? handleDragStart(index) : undefined}
+              onDragEnter={isEditable ? handleDragEnter(index) : undefined}
+              onDragEnd={isEditable ? handleDragEnd : undefined}
+              {...item}
+              ref={focusedId === item.id ? itemRef : null}
+            />
+            <Divider />
+          </Fragment>
+        ))}
       </ol>
       {isErrorTostOpen && (
         <Toast variant="error" closeToast={closeErrorToast}>
-          아이템 순서 변경을 실패했습니다. 잠시 후 다시 시도해 주세요.
+          아이템 순서 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.
         </Toast>
       )}
     </>
   );
 };
 
-TripItemList.Empty = ({ openAddModal }: { openAddModal: () => void }) => {
+interface EmptyTripItemListProps {
+  tripId: number;
+  isEditable?: boolean;
+  openAddModal?: () => void;
+}
+
+TripItemList.Empty = ({ tripId, openAddModal, isEditable = true }: EmptyTripItemListProps) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const navigate = useNavigate();
+
   return (
     <>
-      <Heading size="xSmall">아직 추가된 일정 기록이 없습니다!</Heading>
+      <Heading size="xSmall">추가된 일정 기록이 없습니다!</Heading>
       <Text css={emptyTextStyling}>
         여행하면서 갔던 장소, 사용했던 경비와 같은 여행 일정 기록들을 추가해 보세요.
       </Text>
-      {/* 클릭하면 일정 추가 모달 열기 */}
-      <Button css={addItemButtonStyling} type="button" variant="primary" onClick={openAddModal}>
-        일정 기록 추가하기
-      </Button>
+      {isEditable ? (
+        <Button css={addItemButtonStyling} type="button" variant="primary" onClick={openAddModal}>
+          일정 기록 추가하기
+        </Button>
+      ) : (
+        <Button
+          css={addItemButtonStyling}
+          type="button"
+          variant="primary"
+          onClick={() => navigate(PATH.EDIT_TRIP(tripId))}
+        >
+          여행 수정하기
+        </Button>
+      )}
     </>
   );
 };

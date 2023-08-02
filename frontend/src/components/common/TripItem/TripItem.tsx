@@ -1,6 +1,6 @@
 import { CURRENCY_ICON } from '@constants/trip';
 import type { TripItemData } from '@type/tripItem';
-import { Box, Flex, Heading, ImageCarousel, Text, Theme } from 'hang-log-design-system';
+import { Flex, ImageCarousel, Text, Theme } from 'hang-log-design-system';
 import { forwardRef, useEffect, useRef } from 'react';
 import type { ForwardedRef } from 'react';
 
@@ -13,25 +13,25 @@ import EditMenu from '@components/common/TripItem/EditMenu/EditMenu';
 import {
   expenseStyling,
   getContainerStyling,
-  informationContainerStyling,
   memoStyling,
   starRatingStyling,
-  subInformationStyling,
 } from '@components/common/TripItem/TripItem.style';
 
 interface TripListItemProps extends TripItemData {
   tripId: number;
   dayLogId: number;
+  isEditable?: boolean;
   observer?: IntersectionObserver | null;
-  onDragStart: () => void;
-  onDragEnter: () => void;
-  onDragEnd: () => void;
+  onDragStart?: () => void;
+  onDragEnter?: () => void;
+  onDragEnd?: () => void;
 }
 
 const TripItem = (
   {
     tripId,
     dayLogId,
+    isEditable = true,
     observer,
     onDragStart,
     onDragEnter,
@@ -50,16 +50,15 @@ const TripItem = (
   }, [observer]);
 
   return (
-    // ! 수정 모드에서만 drag할 수 있다
     <li
       ref={itemRef}
-      css={getContainerStyling(isDragging)}
+      css={getContainerStyling({ isEditable, isDragging })}
       data-id={information.id}
-      draggable
+      draggable={isEditable}
       onDragStart={onDragStart}
-      onDrag={handleDrag}
+      onDrag={isEditable ? handleDrag : undefined}
       onDragEnter={onDragEnter}
-      onDragEnd={handleDragEnd}
+      onDragEnd={isEditable ? handleDragEnd : undefined}
     >
       <li ref={ref} id={String(information.id)}>
         <Flex styles={{ gap: Theme.spacer.spacing4 }}>
@@ -74,30 +73,21 @@ const TripItem = (
               images={information.imageUrls}
             />
           )}
-          <Box tag="section" css={informationContainerStyling}>
-            <Heading size="xSmall">{information.title}</Heading>
-            {information.place && (
-              <Text css={subInformationStyling} size="small">
-                {information.place.category.name}
-              </Text>
-            )}
-            {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
-            {information.memo && (
-              <Text css={memoStyling} size="small">
-                {information.memo}
-              </Text>
-            )}
-            {information.expense && (
-              <Text css={expenseStyling} size="small">
-                {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
-                {formatNumberToMoney(information.expense.amount)}
-              </Text>
-            )}
-          </Box>
+          {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
+          {information.memo && (
+            <Text css={memoStyling} size="small">
+              {information.memo}
+            </Text>
+          )}
+          {information.expense && (
+            <Text css={expenseStyling} size="small">
+              {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
+              {formatNumberToMoney(information.expense.amount)}
+            </Text>
+          )}
         </Flex>
+        {isEditable ? <EditMenu tripId={tripId} dayLogId={dayLogId} {...information} /> : null}
       </li>
-      {/* ! 로그인 + 수정 모드일 떄만 볼 수 있다 */}
-      <EditMenu tripId={tripId} dayLogId={dayLogId} {...information} />
     </li>
   );
 };
