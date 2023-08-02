@@ -61,7 +61,7 @@ const TripItem = (
       onDragEnter={onDragEnter}
       onDragEnd={handleDragEnd}
     >
-      <li ref={ref}>
+      <li ref={ref} id={String(information.id)}>
         <Flex styles={{ gap: Theme.spacer.spacing4 }}>
           {information.imageUrls.length > 0 && (
             <ImageCarousel

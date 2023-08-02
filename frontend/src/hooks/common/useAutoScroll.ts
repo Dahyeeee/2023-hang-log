@@ -9,17 +9,7 @@ export const useAutoScroll = (
     const focusedItem = focusItemRef.current;
 
     if (list && focusedItem) {
-      console.log(list, focusedItem);
-      const listRect = list.getBoundingClientRect();
-      const focusedItemRect = focusedItem.getBoundingClientRect();
-
-      const scrollOffset =
-        focusedItemRect.top - listRect.top - listRect.height / 2 + focusedItemRect.height / 2;
-
-      list.scrollTo({
-        top: list.scrollTop + scrollOffset,
-        behavior: 'smooth',
-      });
+      focusedItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 

@@ -59,21 +59,24 @@ const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
   return (
     <>
       <ol css={containerStyling} ref={listRef}>
-        {items.map((item, index) => (
-          <Fragment key={item.id}>
-            <TripItem
-              tripId={tripId}
-              dayLogId={dayLogId}
-              observer={observer}
-              onDragStart={handleDragStart(index)}
-              onDragEnter={handleDragEnter(index)}
-              onDragEnd={handleDragEnd}
-              ref={focusedId === tripId ? itemRef : null}
-              {...item}
-            />
-            <Divider />
-          </Fragment>
-        ))}
+        {items.map((item, index) => {
+          console.log('focusedId', focusedId, focusedId === item.id);
+          return (
+            <Fragment key={item.id}>
+              <TripItem
+                tripId={tripId}
+                dayLogId={dayLogId}
+                observer={observer}
+                onDragStart={handleDragStart(index)}
+                onDragEnter={handleDragEnter(index)}
+                onDragEnd={handleDragEnd}
+                {...item}
+                ref={focusedId === item.id ? itemRef : null}
+              />
+              <Divider />
+            </Fragment>
+          );
+        })}
       </ol>
       {isErrorTostOpen && (
         <Toast variant="error" closeToast={closeErrorToast}>
