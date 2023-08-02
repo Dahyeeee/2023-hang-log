@@ -1,7 +1,8 @@
 import { CURRENCY_ICON } from '@constants/trip';
 import type { TripItemData } from '@type/tripItem';
 import { Box, Flex, Heading, ImageCarousel, Text, Theme } from 'hang-log-design-system';
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
+import type { ForwardedRef } from 'react';
 
 import { formatNumberToMoney } from '@utils/formatter';
 
@@ -27,15 +28,18 @@ interface TripListItemProps extends TripItemData {
   onDragEnd: () => void;
 }
 
-const TripItem = ({
-  tripId,
-  dayLogId,
-  observer,
-  onDragStart,
-  onDragEnter,
-  onDragEnd,
-  ...information
-}: TripListItemProps) => {
+const TripItem = (
+  {
+    tripId,
+    dayLogId,
+    observer,
+    onDragStart,
+    onDragEnter,
+    onDragEnd,
+    ...information
+  }: TripListItemProps,
+  ref: ForwardedRef<HTMLLIElement>
+) => {
   const { isDragging, handleDrag, handleDragEnd } = useDraggedItem(onDragEnd);
   const itemRef = useRef<HTMLLIElement>(null);
 
@@ -57,43 +61,45 @@ const TripItem = ({
       onDragEnter={onDragEnter}
       onDragEnd={handleDragEnd}
     >
-      <Flex styles={{ gap: Theme.spacer.spacing4 }}>
-        {information.imageUrls.length > 0 && (
-          <ImageCarousel
-            width={250}
-            height={167}
-            isDraggable={false}
-            showNavigationOnHover
-            showArrows
-            showDots
-            images={information.imageUrls}
-          />
-        )}
-        <Box tag="section" css={informationContainerStyling}>
-          <Heading size="xSmall">{information.title}</Heading>
-          {information.place && (
-            <Text css={subInformationStyling} size="small">
-              {information.place.category.name}
-            </Text>
+      <li ref={ref}>
+        <Flex styles={{ gap: Theme.spacer.spacing4 }}>
+          {information.imageUrls.length > 0 && (
+            <ImageCarousel
+              width={250}
+              height={167}
+              isDraggable={false}
+              showNavigationOnHover
+              showArrows
+              showDots
+              images={information.imageUrls}
+            />
           )}
-          {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
-          {information.memo && (
-            <Text css={memoStyling} size="small">
-              {information.memo}
-            </Text>
-          )}
-          {information.expense && (
-            <Text css={expenseStyling} size="small">
-              {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
-              {formatNumberToMoney(information.expense.amount)}
-            </Text>
-          )}
-        </Box>
-      </Flex>
+          <Box tag="section" css={informationContainerStyling}>
+            <Heading size="xSmall">{information.title}</Heading>
+            {information.place && (
+              <Text css={subInformationStyling} size="small">
+                {information.place.category.name}
+              </Text>
+            )}
+            {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
+            {information.memo && (
+              <Text css={memoStyling} size="small">
+                {information.memo}
+              </Text>
+            )}
+            {information.expense && (
+              <Text css={expenseStyling} size="small">
+                {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
+                {formatNumberToMoney(information.expense.amount)}
+              </Text>
+            )}
+          </Box>
+        </Flex>
+      </li>
       {/* ! 로그인 + 수정 모드일 떄만 볼 수 있다 */}
       <EditMenu tripId={tripId} dayLogId={dayLogId} {...information} />
     </li>
   );
 };
 
-export default TripItem;
+export default forwardRef(TripItem);

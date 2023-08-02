@@ -1,7 +1,10 @@
+import { useAutoScroll } from '@/hooks/common/useAutoScroll';
 import { useScrollFocus } from '@/hooks/common/useScrollFocus';
+import { focusedIdState } from '@/store/scrollFocus';
 import type { TripItemData } from '@type/tripItem';
 import { Button, Divider, Heading, Text, Toast, useOverlay } from 'hang-log-design-system';
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
+import { useRecoilValue } from 'recoil';
 
 import { useDayLogOrderMutation } from '@hooks/api/useDayLogOrderMutation';
 import { useDragAndDrop } from '@hooks/common/useDragAndDrop';
@@ -22,7 +25,15 @@ interface TripItemListProps {
 const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
   const dayLogOrderMutation = useDayLogOrderMutation();
   const { observer } = useScrollFocus();
+  const listRef = useRef<HTMLOListElement>(null);
+  const itemRef = useRef<HTMLLIElement>(null);
+  const { scrollToFocusedItem } = useAutoScroll(listRef, itemRef);
+  const focusedId = useRecoilValue(focusedIdState);
   const { isOpen: isErrorTostOpen, open: openErrorToast, close: closeErrorToast } = useOverlay();
+
+  useEffect(() => {
+    scrollToFocusedItem();
+  }, [focusedId, scrollToFocusedItem]);
 
   const handlePositionChange = (newItems: TripItemData[]) => {
     const itemIds = newItems.map((item) => item.id);
@@ -47,7 +58,7 @@ const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
 
   return (
     <>
-      <ol css={containerStyling}>
+      <ol css={containerStyling} ref={listRef}>
         {items.map((item, index) => (
           <Fragment key={item.id}>
             <TripItem
@@ -57,6 +68,7 @@ const TripItemList = ({ tripId, dayLogId, tripItems }: TripItemListProps) => {
               onDragStart={handleDragStart(index)}
               onDragEnter={handleDragEnter(index)}
               onDragEnd={handleDragEnd}
+              ref={focusedId === tripId ? itemRef : null}
               {...item}
             />
             <Divider />

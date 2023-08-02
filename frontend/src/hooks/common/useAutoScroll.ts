@@ -9,6 +9,7 @@ export const useAutoScroll = (
     const focusedItem = focusItemRef.current;
 
     if (list && focusedItem) {
+      console.log(list, focusedItem);
       const listRect = list.getBoundingClientRect();
       const focusedItemRect = focusedItem.getBoundingClientRect();
 

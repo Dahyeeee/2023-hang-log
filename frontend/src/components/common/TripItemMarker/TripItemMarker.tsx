@@ -1,5 +1,7 @@
+import { focusedIdState } from '@/store/scrollFocus';
 import { MARKER_STYLE } from '@constants/map';
 import { useEffect, useState } from 'react';
+import { useSetRecoilState } from 'recoil';
 
 interface TripItemMarkerProps {
   map: google.maps.Map;
@@ -11,6 +13,7 @@ interface TripItemMarkerProps {
 
 const TripItemMarker = ({ map, id, lat, lng, isSelected }: TripItemMarkerProps) => {
   const [marker, setMarker] = useState<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const setFocusedId = useSetRecoilState(focusedIdState);
 
   useEffect(() => {
     const marker = new google.maps.marker.AdvancedMarkerElement({
@@ -34,6 +37,12 @@ const TripItemMarker = ({ map, id, lat, lng, isSelected }: TripItemMarkerProps) 
       marker.content = pin.element;
     }
   }, [id, isSelected, marker]);
+
+  useEffect(() => {
+    marker?.addListener('click', () => {
+      setFocusedId(id);
+    });
+  }, [id, marker]);
 
   return null;
 };
