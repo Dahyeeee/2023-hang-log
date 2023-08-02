@@ -1,6 +1,6 @@
 import { useAutoScroll } from '@/hooks/common/useAutoScroll';
 import { useScrollFocus } from '@/hooks/common/useScrollFocus';
-import { focusedIdState } from '@/store/scrollFocus';
+import { markerFocusIdStat } from '@/store/scrollFocus';
 import { PATH } from '@constants/path';
 import type { TripItemData } from '@type/tripItem';
 import { Button, Divider, Heading, Text, Toast, useOverlay } from 'hang-log-design-system';
@@ -31,7 +31,7 @@ const TripItemList = ({ tripId, dayLogId, tripItems, isEditable = true }: TripIt
   const listRef = useRef<HTMLOListElement>(null);
   const itemRef = useRef<HTMLLIElement>(null);
   const { scrollToFocusedItem } = useAutoScroll(listRef, itemRef);
-  const focusedId = useRecoilValue(focusedIdState);
+  const focusedId = useRecoilValue(markerFocusIdStat);
   const { isOpen: isErrorTostOpen, open: openErrorToast, close: closeErrorToast } = useOverlay();
 
   useEffect(() => {

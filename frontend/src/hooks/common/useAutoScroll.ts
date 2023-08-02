@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 
 export const useAutoScroll = (
   listRef: RefObject<HTMLElement>,
-  focusItemRef: RefObject<HTMLLIElement>
+  focusItemRef: RefObject<HTMLElement>
 ) => {
   const scrollToFocusedItem = () => {
     const list = listRef.current;

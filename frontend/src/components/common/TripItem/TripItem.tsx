@@ -60,34 +60,33 @@ const TripItem = (
       onDragEnter={onDragEnter}
       onDragEnd={isEditable ? handleDragEnd : undefined}
     >
-      <li ref={ref} id={String(information.id)}>
-        <Flex styles={{ gap: Theme.spacer.spacing4 }}>
-          {information.imageUrls.length > 0 && (
-            <ImageCarousel
-              width={250}
-              height={167}
-              isDraggable={false}
-              showNavigationOnHover
-              showArrows
-              showDots
-              images={information.imageUrls}
-            />
-          )}
-          {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
-          {information.memo && (
-            <Text css={memoStyling} size="small">
-              {information.memo}
-            </Text>
-          )}
-          {information.expense && (
-            <Text css={expenseStyling} size="small">
-              {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
-              {formatNumberToMoney(information.expense.amount)}
-            </Text>
-          )}
-        </Flex>
-        {isEditable ? <EditMenu tripId={tripId} dayLogId={dayLogId} {...information} /> : null}
-      </li>
+      <li ref={ref} id={String(information.id)} />
+      <Flex ref={ref} styles={{ gap: Theme.spacer.spacing4 }}>
+        {information.imageUrls.length > 0 && (
+          <ImageCarousel
+            width={250}
+            height={167}
+            isDraggable={false}
+            showNavigationOnHover
+            showArrows
+            showDots
+            images={information.imageUrls}
+          />
+        )}
+        {information.rating && <StarRating css={starRatingStyling} rate={information.rating} />}
+        {information.memo && (
+          <Text css={memoStyling} size="small">
+            {information.memo}
+          </Text>
+        )}
+        {information.expense && (
+          <Text css={expenseStyling} size="small">
+            {information.expense.category.name} · {CURRENCY_ICON[information.expense.currency]}
+            {formatNumberToMoney(information.expense.amount)}
+          </Text>
+        )}
+      </Flex>
+      {isEditable ? <EditMenu tripId={tripId} dayLogId={dayLogId} {...information} /> : null}
     </li>
   );
 };
